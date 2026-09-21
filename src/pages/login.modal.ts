@@ -28,9 +28,27 @@ export class LoginModal extends BasePage {
     );
   }
 
-  async signUp(username: string, password: string): Promise<string> {
+  async openSignUpModal(): Promise<void> {
     await this.signUpNav.click();
     await this.signUpModal.waitForOpen();
+  }
+
+  async closeSignUpModal(): Promise<void> {
+    await this.signUpModal.footerButton("Close").click();
+    await this.signUpModal.waitForClosed();
+  }
+
+  async openLoginModal(): Promise<void> {
+    await this.loginNav.click();
+    await this.loginModal.waitForOpen();
+  }
+
+  async closeLoginModal(): Promise<void> {
+    await this.loginModal.footerButton("Close").click();
+    await this.loginModal.waitForClosed();
+  }
+
+  private async fillSignUp(username: string, password: string): Promise<void> {
     await new InputControl(
       this.page.locator("#sign-username"),
       "Sign up username",
@@ -39,6 +57,22 @@ export class LoginModal extends BasePage {
       this.page.locator("#sign-password"),
       "Sign up password",
     ).fill(password);
+  }
+
+  private async fillLogin(username: string, password: string): Promise<void> {
+    await new InputControl(
+      this.page.locator("#loginusername"),
+      "Login username",
+    ).fill(username);
+    await new InputControl(
+      this.page.locator("#loginpassword"),
+      "Login password",
+    ).fill(password);
+  }
+
+  async signUp(username: string, password: string): Promise<string> {
+    await this.openSignUpModal();
+    await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () =>
       this.signUpModal.footerButton("Sign up").click(),
@@ -57,17 +91,45 @@ export class LoginModal extends BasePage {
     return message;
   }
 
+  async signUpExpectingAlert(
+    username: string,
+    password: string,
+  ): Promise<string> {
+    await this.openSignUpModal();
+    await this.fillSignUp(username, password);
+
+    const message = await this.acceptAlertFrom(async () =>
+      this.signUpModal.footerButton("Sign up").click(),
+    );
+
+    if (await this.signUpModal.raw.isVisible()) {
+      await this.closeSignUpModal();
+    }
+
+    return message;
+  }
+
   async logIn(username: string, password: string): Promise<void> {
-    await this.loginNav.click();
-    await this.loginModal.waitForOpen();
-    await new InputControl(
-      this.page.locator("#loginusername"),
-      "Login username",
-    ).fill(username);
-    await new InputControl(
-      this.page.locator("#loginpassword"),
-      "Login password",
-    ).fill(password);
+    await this.openLoginModal();
+    await this.fillLogin(username, password);
     await this.loginModal.footerButton("Log in").click();
+  }
+
+  async logInExpectingAlert(
+    username: string,
+    password: string,
+  ): Promise<string> {
+    await this.openLoginModal();
+    await this.fillLogin(username, password);
+
+    const message = await this.acceptAlertFrom(async () =>
+      this.loginModal.footerButton("Log in").click(),
+    );
+
+    if (await this.loginModal.raw.isVisible()) {
+      await this.closeLoginModal();
+    }
+
+    return message;
   }
 }

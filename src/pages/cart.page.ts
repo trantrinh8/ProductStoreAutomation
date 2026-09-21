@@ -35,6 +35,10 @@ export class CartPage extends BasePage {
     return this.page.locator("#tbodyid tr").filter({ hasText: productName });
   }
 
+  private get productRows() {
+    return this.page.locator("#tbodyid tr");
+  }
+
   private orderInput(id: string, name: string): InputControl {
     return new InputControl(this.page.locator(`#${id}`), name);
   }
@@ -47,6 +51,14 @@ export class CartPage extends BasePage {
     await expect(row).toBeVisible();
     await expect(row.locator("td").nth(1)).toHaveText(productName);
     await expect(row.locator("td").nth(2)).toHaveText(expectedPrice);
+  }
+
+  async expectProductQuantity(productName: string, quantity: number): Promise<void> {
+    await expect(this.cartRow(productName)).toHaveCount(quantity);
+  }
+
+  async expectCartEmpty(): Promise<void> {
+    await expect(this.productRows).toHaveCount(0);
   }
 
   async deleteProduct(productName: string): Promise<void> {
@@ -74,6 +86,13 @@ export class CartPage extends BasePage {
     await this.orderModal.footerButton("Purchase").click();
   }
 
+  async purchaseExpectingAlert(expectedMessage?: string): Promise<string> {
+    return this.acceptAlertFrom(
+      async () => this.orderModal.footerButton("Purchase").click(),
+      expectedMessage,
+    );
+  }
+
   async expectPurchaseSuccess(): Promise<void> {
     await expect(this.page.locator(".sweet-alert")).toBeVisible();
     await expect(this.page.locator(".sweet-alert h2")).toHaveText(
@@ -82,5 +101,10 @@ export class CartPage extends BasePage {
     await expect(this.page.locator(".sweet-alert .lead")).toContainText(
       "Amount:",
     );
+  }
+
+  async closePurchaseConfirmation(): Promise<void> {
+    await this.page.locator(".sweet-alert").getByRole("button", { name: "OK" }).click();
+    await expect(this.page.locator(".sweet-alert")).toBeHidden();
   }
 }

@@ -11,7 +11,7 @@ export class HomePage extends BasePage {
 
   private category(category: ProductCategory): ButtonControl {
     return new ButtonControl(
-      this.page.getByRole("link", { name: category }),
+      this.page.getByRole("link", { name: category, exact: true }),
       `${category} category`,
     );
   }
@@ -19,7 +19,13 @@ export class HomePage extends BasePage {
   productCard(productName: string) {
     return this.page
       .locator(".card")
-      .filter({ has: this.page.getByRole("link", { name: productName }) });
+      .filter({
+        has: this.page.getByRole("link", { name: productName, exact: true }),
+      });
+  }
+
+  productLink(productName: string) {
+    return this.page.getByRole("link", { name: productName, exact: true });
   }
 
   async open(): Promise<void> {
@@ -35,9 +41,17 @@ export class HomePage extends BasePage {
   }
 
   async selectProduct(productName: string): Promise<void> {
-    const productLink = this.page.getByRole("link", { name: productName });
+    const productLink = this.productLink(productName);
     await expect(productLink).toBeVisible();
     await productLink.click();
     await expect(this.page.locator(".name")).toHaveText(productName);
+  }
+
+  async expectProductVisible(productName: string): Promise<void> {
+    await expect(this.productCard(productName)).toBeVisible();
+  }
+
+  async expectProductAbsent(productName: string): Promise<void> {
+    await expect(this.productCard(productName)).toHaveCount(0);
   }
 }
