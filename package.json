@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:e2e": "playwright test --project=chromium --project=firefox",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
