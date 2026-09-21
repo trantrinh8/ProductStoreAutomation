@@ -17,11 +17,9 @@ export class HomePage extends BasePage {
   }
 
   productCard(productName: string) {
-    return this.page
-      .locator(".card")
-      .filter({
-        has: this.page.getByRole("link", { name: productName, exact: true }),
-      });
+    return this.page.locator(".card").filter({
+      has: this.page.getByRole("link", { name: productName, exact: true }),
+    });
   }
 
   productLink(productName: string) {

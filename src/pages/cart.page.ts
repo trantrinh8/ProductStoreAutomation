@@ -53,7 +53,10 @@ export class CartPage extends BasePage {
     await expect(row.locator("td").nth(2)).toHaveText(expectedPrice);
   }
 
-  async expectProductQuantity(productName: string, quantity: number): Promise<void> {
+  async expectProductQuantity(
+    productName: string,
+    quantity: number,
+  ): Promise<void> {
     await expect(this.cartRow(productName)).toHaveCount(quantity);
   }
 
@@ -104,7 +107,10 @@ export class CartPage extends BasePage {
   }
 
   async closePurchaseConfirmation(): Promise<void> {
-    await this.page.locator(".sweet-alert").getByRole("button", { name: "OK" }).click();
+    await this.page
+      .locator(".sweet-alert")
+      .getByRole("button", { name: "OK" })
+      .click();
     await expect(this.page.locator(".sweet-alert")).toBeHidden();
   }
 }

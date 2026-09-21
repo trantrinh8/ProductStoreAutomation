@@ -207,7 +207,9 @@ test.describe("Demoblaze cart and order edge cases", () => {
     });
   });
 
-  test("TC-ORDER-EDGE-002 documents expired date behavior", async ({ page }) => {
+  test("TC-ORDER-EDGE-002 documents expired date behavior", async ({
+    page,
+  }) => {
     const cartPage = new CartPage(page);
     test.info().annotations.push({
       type: "product-defect",

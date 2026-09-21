@@ -96,7 +96,9 @@ test.describe("Demoblaze catalog and navigation", () => {
       await homePage.open();
       await homePage.filterByCategory("Laptops");
       await homePage.selectProduct("Sony vaio i5");
-      await expect(page.getByRole("link", { name: "Add to cart" })).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Add to cart" }),
+      ).toBeVisible();
     });
 
     await test.step("Click the navbar Cart link only", async () => {
