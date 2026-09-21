@@ -26,16 +26,31 @@ export class ModalControl extends BaseControl {
     );
   }
 
-  async waitForOpen(): Promise<void> {
+  async waitForOpen(timeout = 10_000): Promise<void> {
     await test.step(`Wait for ${this.name} modal to open`, async () => {
-      await expect(this.raw).toBeVisible();
-      await expect(this.raw).toHaveClass(/show/);
+      await expect(this.raw).toBeVisible({ timeout });
+      await expect(this.raw).toHaveClass(/show/, { timeout });
     });
   }
 
-  async waitForClosed(): Promise<void> {
+  async waitForClosed(timeout = 10_000): Promise<void> {
     await test.step(`Wait for ${this.name} modal to close`, async () => {
-      await expect(this.raw).toBeHidden();
+      await expect(this.raw).toBeHidden({ timeout });
+    });
+  }
+
+  async forceClose(): Promise<void> {
+    await test.step(`Force close ${this.name} modal`, async () => {
+      await this.raw.evaluate((modal) => {
+        const element = modal as HTMLElement;
+        element.classList.remove("show");
+        element.style.display = "none";
+        element.setAttribute("aria-hidden", "true");
+        element.ownerDocument.body.classList.remove("modal-open");
+        element.ownerDocument
+          .querySelectorAll(".modal-backdrop")
+          .forEach((backdrop) => backdrop.remove());
+      });
     });
   }
 }

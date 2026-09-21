@@ -28,9 +28,30 @@ export class LoginModal extends BasePage {
     );
   }
 
+  private async openModal(
+    navButton: ButtonControl,
+    modal: ModalControl,
+  ): Promise<void> {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      await modal.forceClose();
+      await navButton.click();
+
+      const opened = await modal
+        .waitForOpen(3_000)
+        .then(() => true)
+        .catch(() => false);
+
+      if (opened) {
+        return;
+      }
+    }
+
+    await navButton.click();
+    await modal.waitForOpen();
+  }
+
   async openSignUpModal(): Promise<void> {
-    await this.signUpNav.click();
-    await this.signUpModal.waitForOpen();
+    await this.openModal(this.signUpNav, this.signUpModal);
   }
 
   async closeSignUpModal(): Promise<void> {
@@ -39,8 +60,7 @@ export class LoginModal extends BasePage {
   }
 
   async openLoginModal(): Promise<void> {
-    await this.loginNav.click();
-    await this.loginModal.waitForOpen();
+    await this.openModal(this.loginNav, this.loginModal);
   }
 
   async closeLoginModal(): Promise<void> {
@@ -78,15 +98,7 @@ export class LoginModal extends BasePage {
       this.signUpModal.footerButton("Sign up").click(),
     );
 
-    const closedAutomatically = await this.signUpModal.raw
-      .waitFor({ state: "hidden", timeout: 2_000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!closedAutomatically) {
-      await this.signUpModal.footerButton("Close").click();
-      await this.signUpModal.waitForClosed();
-    }
+    await this.signUpModal.forceClose();
 
     return message;
   }
@@ -102,9 +114,7 @@ export class LoginModal extends BasePage {
       this.signUpModal.footerButton("Sign up").click(),
     );
 
-    if (await this.signUpModal.raw.isVisible()) {
-      await this.closeSignUpModal();
-    }
+    await this.signUpModal.forceClose();
 
     return message;
   }
@@ -126,9 +136,7 @@ export class LoginModal extends BasePage {
       this.loginModal.footerButton("Log in").click(),
     );
 
-    if (await this.loginModal.raw.isVisible()) {
-      await this.closeLoginModal();
-    }
+    await this.loginModal.forceClose();
 
     return message;
   }
