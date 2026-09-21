@@ -1,6 +1,8 @@
-# Demoblaze Automation Framework
+# ProductStoreAutomation
 
 Production-ready automation framework for `https://www.demoblaze.com` using TypeScript, Playwright, Allure Report, and K6.
+
+This task is designed to evaluate your capability in handling test case documentation, architecting a scalable end-to-end automation framework, and showcasing hands-on automation proficiency.
 
 ## Install
 
