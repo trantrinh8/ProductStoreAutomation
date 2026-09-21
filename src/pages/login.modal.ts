@@ -44,7 +44,12 @@ export class LoginModal extends BasePage {
       this.signUpModal.footerButton("Sign up").click(),
     );
 
-    if (await this.signUpModal.raw.isVisible()) {
+    const closedAutomatically = await this.signUpModal.raw
+      .waitFor({ state: "hidden", timeout: 2_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!closedAutomatically) {
       await this.signUpModal.footerButton("Close").click();
       await this.signUpModal.waitForClosed();
     }
