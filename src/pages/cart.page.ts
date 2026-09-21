@@ -4,6 +4,32 @@ import { InputControl } from "../controls/input.control.js";
 import { ModalControl } from "../controls/modal.control.js";
 import { BasePage } from "./base.page.js";
 
+const SELECTOR = {
+  MODAL_ORDER: "//div[@id='orderModal']",
+  BTN_PLACE_ORDER: "//button[normalize-space()='Place Order']",
+  BTN_PURCHASE: "//div[@id='orderModal']//button[normalize-space()='Purchase']",
+  BTN_CONFIRM_PURCHASE_OK:
+    "//*[contains(concat(' ', normalize-space(@class), ' '), ' sweet-alert ')]//button[normalize-space()='OK']",
+  TXT_ORDER_NAME: "//input[@id='name']",
+  TXT_ORDER_COUNTRY: "//input[@id='country']",
+  TXT_ORDER_CITY: "//input[@id='city']",
+  TXT_ORDER_CARD: "//input[@id='card']",
+  TXT_ORDER_MONTH: "//input[@id='month']",
+  TXT_ORDER_YEAR: "//input[@id='year']",
+  ROW_CART_PRODUCT: (productName: string) =>
+    `//tbody[@id='tbodyid']//tr[td[normalize-space()='${productName}']]`,
+  ROW_CART_PRODUCT_ALL: "//tbody[@id='tbodyid']//tr",
+  COL_PRODUCT_NAME: "xpath=.//td[2]",
+  COL_PRODUCT_PRICE: "xpath=.//td[3]",
+  LNK_DELETE: "xpath=.//a[normalize-space()='Delete']",
+  MSG_PURCHASE_SUCCESS:
+    "//*[contains(concat(' ', normalize-space(@class), ' '), ' sweet-alert ')]",
+  MSG_PURCHASE_SUCCESS_TITLE:
+    "//*[contains(concat(' ', normalize-space(@class), ' '), ' sweet-alert ')]//h2",
+  MSG_PURCHASE_SUCCESS_DETAILS:
+    "//*[contains(concat(' ', normalize-space(@class), ' '), ' sweet-alert ')]//*[contains(concat(' ', normalize-space(@class), ' '), ' lead ')]",
+};
+
 export interface OrderDetails {
   name: string;
   country: string;
@@ -19,28 +45,31 @@ export class CartPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.orderModal = new ModalControl(
-      page.locator("#orderModal"),
+      page.locator(SELECTOR.MODAL_ORDER),
       "Place order",
     );
   }
 
   private get placeOrderButton(): ButtonControl {
     return new ButtonControl(
-      this.page.getByRole("button", { name: "Place Order" }),
+      this.page.locator(SELECTOR.BTN_PLACE_ORDER),
       "Place Order",
     );
   }
 
+  private get purchaseButton(): ButtonControl {
+    return new ButtonControl(
+      this.page.locator(SELECTOR.BTN_PURCHASE),
+      "Purchase",
+    );
+  }
+
   private cartRow(productName: string) {
-    return this.page.locator("#tbodyid tr").filter({ hasText: productName });
+    return this.page.locator(SELECTOR.ROW_CART_PRODUCT(productName));
   }
 
   private get productRows() {
-    return this.page.locator("#tbodyid tr");
-  }
-
-  private orderInput(id: string, name: string): InputControl {
-    return new InputControl(this.page.locator(`#${id}`), name);
+    return this.page.locator(SELECTOR.ROW_CART_PRODUCT_ALL);
   }
 
   async expectProductInCart(
@@ -49,8 +78,12 @@ export class CartPage extends BasePage {
   ): Promise<void> {
     const row = this.cartRow(productName);
     await expect(row).toBeVisible();
-    await expect(row.locator("td").nth(1)).toHaveText(productName);
-    await expect(row.locator("td").nth(2)).toHaveText(expectedPrice);
+    await expect(row.locator(SELECTOR.COL_PRODUCT_NAME)).toHaveText(
+      productName,
+    );
+    await expect(row.locator(SELECTOR.COL_PRODUCT_PRICE)).toHaveText(
+      expectedPrice,
+    );
   }
 
   async expectProductQuantity(
@@ -65,9 +98,7 @@ export class CartPage extends BasePage {
   }
 
   async deleteProduct(productName: string): Promise<void> {
-    await this.cartRow(productName)
-      .getByRole("link", { name: "Delete" })
-      .click();
+    await this.cartRow(productName).locator(SELECTOR.LNK_DELETE).click();
     await expect(this.cartRow(productName)).toBeHidden();
   }
 
@@ -77,40 +108,57 @@ export class CartPage extends BasePage {
   }
 
   async fillOrder(details: OrderDetails): Promise<void> {
-    await this.orderInput("name", "Name").fill(details.name);
-    await this.orderInput("country", "Country").fill(details.country);
-    await this.orderInput("city", "City").fill(details.city);
-    await this.orderInput("card", "Credit card").fill(details.card);
-    await this.orderInput("month", "Month").fill(details.month);
-    await this.orderInput("year", "Year").fill(details.year);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_NAME),
+      "Name",
+    ).fill(details.name);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_COUNTRY),
+      "Country",
+    ).fill(details.country);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_CITY),
+      "City",
+    ).fill(details.city);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_CARD),
+      "Credit card",
+    ).fill(details.card);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_MONTH),
+      "Month",
+    ).fill(details.month);
+    await new InputControl(
+      this.page.locator(SELECTOR.TXT_ORDER_YEAR),
+      "Year",
+    ).fill(details.year);
   }
 
   async purchase(): Promise<void> {
-    await this.orderModal.footerButton("Purchase").click();
+    await this.purchaseButton.click();
   }
 
   async purchaseExpectingAlert(expectedMessage?: string): Promise<string> {
     return this.acceptAlertFrom(
-      async () => this.orderModal.footerButton("Purchase").click(),
+      async () => this.purchaseButton.click(),
       expectedMessage,
     );
   }
 
   async expectPurchaseSuccess(): Promise<void> {
-    await expect(this.page.locator(".sweet-alert")).toBeVisible();
-    await expect(this.page.locator(".sweet-alert h2")).toHaveText(
-      "Thank you for your purchase!",
-    );
-    await expect(this.page.locator(".sweet-alert .lead")).toContainText(
-      "Amount:",
-    );
+    await expect(
+      this.page.locator(SELECTOR.MSG_PURCHASE_SUCCESS),
+    ).toBeVisible();
+    await expect(
+      this.page.locator(SELECTOR.MSG_PURCHASE_SUCCESS_TITLE),
+    ).toHaveText("Thank you for your purchase!");
+    await expect(
+      this.page.locator(SELECTOR.MSG_PURCHASE_SUCCESS_DETAILS),
+    ).toContainText("Amount:");
   }
 
   async closePurchaseConfirmation(): Promise<void> {
-    await this.page
-      .locator(".sweet-alert")
-      .getByRole("button", { name: "OK" })
-      .click();
-    await expect(this.page.locator(".sweet-alert")).toBeHidden();
+    await this.page.locator(SELECTOR.BTN_CONFIRM_PURCHASE_OK).click();
+    await expect(this.page.locator(SELECTOR.MSG_PURCHASE_SUCCESS)).toBeHidden();
   }
 }

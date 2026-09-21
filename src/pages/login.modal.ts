@@ -4,27 +4,80 @@ import { InputControl } from "../controls/input.control.js";
 import { ModalControl } from "../controls/modal.control.js";
 import { BasePage } from "./base.page.js";
 
+const SELECTOR = {
+  MODAL_LOGIN: "//div[@id='logInModal']",
+  MODAL_SIGN_UP: "//div[@id='signInModal']",
+  LNK_LOGIN: "//a[@id='login2']",
+  LNK_SIGN_UP: "//a[@id='signin2']",
+  TXT_SIGN_UP_USERNAME: "//input[@id='sign-username']",
+  TXT_SIGN_UP_PASSWORD: "//input[@id='sign-password']",
+  TXT_LOGIN_USERNAME: "//input[@id='loginusername']",
+  TXT_LOGIN_PASSWORD: "//input[@id='loginpassword']",
+  BTN_SIGN_UP_CLOSE:
+    "//div[@id='signInModal']//div[contains(concat(' ', normalize-space(@class), ' '), ' modal-footer ')]//button[normalize-space()='Close']",
+  BTN_SIGN_UP_SUBMIT:
+    "//div[@id='signInModal']//div[contains(concat(' ', normalize-space(@class), ' '), ' modal-footer ')]//button[normalize-space()='Sign up']",
+  BTN_LOGIN_CLOSE:
+    "//div[@id='logInModal']//div[contains(concat(' ', normalize-space(@class), ' '), ' modal-footer ')]//button[normalize-space()='Close']",
+  BTN_LOGIN_SUBMIT:
+    "//div[@id='logInModal']//div[contains(concat(' ', normalize-space(@class), ' '), ' modal-footer ')]//button[normalize-space()='Log in']",
+};
+
 export class LoginModal extends BasePage {
   private readonly loginModal: ModalControl;
   private readonly signUpModal: ModalControl;
 
   constructor(page: Page) {
     super(page);
-    this.loginModal = new ModalControl(page.locator("#logInModal"), "Log in");
+    this.loginModal = new ModalControl(
+      page.locator(SELECTOR.MODAL_LOGIN),
+      "Log in",
+    );
     this.signUpModal = new ModalControl(
-      page.locator("#signInModal"),
+      page.locator(SELECTOR.MODAL_SIGN_UP),
       "Sign up",
     );
   }
 
   private get loginNav(): ButtonControl {
-    return new ButtonControl(this.page.locator("#login2"), "Log in navigation");
+    return new ButtonControl(
+      this.page.locator(SELECTOR.LNK_LOGIN),
+      "Log in navigation",
+    );
   }
 
   private get signUpNav(): ButtonControl {
     return new ButtonControl(
-      this.page.locator("#signin2"),
+      this.page.locator(SELECTOR.LNK_SIGN_UP),
       "Sign up navigation",
+    );
+  }
+
+  private get signUpCloseButton(): ButtonControl {
+    return new ButtonControl(
+      this.page.locator(SELECTOR.BTN_SIGN_UP_CLOSE),
+      "Sign up Close",
+    );
+  }
+
+  private get signUpSubmitButton(): ButtonControl {
+    return new ButtonControl(
+      this.page.locator(SELECTOR.BTN_SIGN_UP_SUBMIT),
+      "Sign up",
+    );
+  }
+
+  private get loginCloseButton(): ButtonControl {
+    return new ButtonControl(
+      this.page.locator(SELECTOR.BTN_LOGIN_CLOSE),
+      "Log in Close",
+    );
+  }
+
+  private get loginSubmitButton(): ButtonControl {
+    return new ButtonControl(
+      this.page.locator(SELECTOR.BTN_LOGIN_SUBMIT),
+      "Log in",
     );
   }
 
@@ -55,7 +108,7 @@ export class LoginModal extends BasePage {
   }
 
   async closeSignUpModal(): Promise<void> {
-    await this.signUpModal.footerButton("Close").click();
+    await this.signUpCloseButton.click();
     await this.signUpModal.waitForClosed();
   }
 
@@ -64,28 +117,28 @@ export class LoginModal extends BasePage {
   }
 
   async closeLoginModal(): Promise<void> {
-    await this.loginModal.footerButton("Close").click();
+    await this.loginCloseButton.click();
     await this.loginModal.waitForClosed();
   }
 
   private async fillSignUp(username: string, password: string): Promise<void> {
     await new InputControl(
-      this.page.locator("#sign-username"),
+      this.page.locator(SELECTOR.TXT_SIGN_UP_USERNAME),
       "Sign up username",
     ).fill(username);
     await new InputControl(
-      this.page.locator("#sign-password"),
+      this.page.locator(SELECTOR.TXT_SIGN_UP_PASSWORD),
       "Sign up password",
     ).fill(password);
   }
 
   private async fillLogin(username: string, password: string): Promise<void> {
     await new InputControl(
-      this.page.locator("#loginusername"),
+      this.page.locator(SELECTOR.TXT_LOGIN_USERNAME),
       "Login username",
     ).fill(username);
     await new InputControl(
-      this.page.locator("#loginpassword"),
+      this.page.locator(SELECTOR.TXT_LOGIN_PASSWORD),
       "Login password",
     ).fill(password);
   }
@@ -95,7 +148,7 @@ export class LoginModal extends BasePage {
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.signUpModal.footerButton("Sign up").click();
+      await this.signUpSubmitButton.click();
     });
 
     await this.signUpModal.forceClose();
@@ -111,7 +164,7 @@ export class LoginModal extends BasePage {
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.signUpModal.footerButton("Sign up").click();
+      await this.signUpSubmitButton.click();
     });
 
     await this.signUpModal.forceClose();
@@ -122,7 +175,7 @@ export class LoginModal extends BasePage {
   async logIn(username: string, password: string): Promise<void> {
     await this.openLoginModal();
     await this.fillLogin(username, password);
-    await this.loginModal.footerButton("Log in").click();
+    await this.loginSubmitButton.click();
   }
 
   async logInExpectingAlert(
@@ -133,7 +186,7 @@ export class LoginModal extends BasePage {
     await this.fillLogin(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.loginModal.footerButton("Log in").click();
+      await this.loginSubmitButton.click();
     });
 
     await this.loginModal.forceClose();

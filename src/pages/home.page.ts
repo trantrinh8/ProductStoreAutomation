@@ -4,6 +4,20 @@ import { BasePage } from "./base.page.js";
 
 export type ProductCategory = "Phones" | "Laptops" | "Monitors";
 
+const SELECTOR = {
+  LNK_CATEGORY: (category: ProductCategory) =>
+    `//a[normalize-space()='${category}']`,
+  LNK_PRODUCT: (productName: string) =>
+    `//a[normalize-space()='${productName}']`,
+  CARD_PRODUCT: (productName: string) =>
+    `//div[contains(concat(' ', normalize-space(@class), ' '), ' card ')][.//a[normalize-space()='${productName}']]`,
+  LBL_PRODUCT_GRID: "//div[@id='tbodyid']",
+  LBL_PRODUCT_CARD:
+    "//div[@id='tbodyid']//div[contains(concat(' ', normalize-space(@class), ' '), ' card ')]",
+  LBL_PRODUCT_NAME:
+    "//*[contains(concat(' ', normalize-space(@class), ' '), ' name ')]",
+};
+
 export class HomePage extends BasePage {
   constructor(page: Page) {
     super(page);
@@ -11,30 +25,28 @@ export class HomePage extends BasePage {
 
   private category(category: ProductCategory): ButtonControl {
     return new ButtonControl(
-      this.page.getByRole("link", { name: category, exact: true }),
+      this.page.locator(SELECTOR.LNK_CATEGORY(category)),
       `${category} category`,
     );
   }
 
   productCard(productName: string) {
-    return this.page.locator(".card").filter({
-      has: this.page.getByRole("link", { name: productName, exact: true }),
-    });
+    return this.page.locator(SELECTOR.CARD_PRODUCT(productName));
   }
 
   productLink(productName: string) {
-    return this.page.getByRole("link", { name: productName, exact: true });
+    return this.page.locator(SELECTOR.LNK_PRODUCT(productName));
   }
 
   async open(): Promise<void> {
     await this.goto("/");
-    await expect(this.page.locator("#tbodyid")).toBeVisible();
+    await expect(this.page.locator(SELECTOR.LBL_PRODUCT_GRID)).toBeVisible();
   }
 
   async filterByCategory(category: ProductCategory): Promise<void> {
     await this.category(category).click();
     await expect
-      .poll(async () => this.page.locator("#tbodyid .card").count())
+      .poll(async () => this.page.locator(SELECTOR.LBL_PRODUCT_CARD).count())
       .toBeGreaterThan(0);
   }
 
@@ -42,7 +54,9 @@ export class HomePage extends BasePage {
     const productLink = this.productLink(productName);
     await expect(productLink).toBeVisible();
     await productLink.click();
-    await expect(this.page.locator(".name")).toHaveText(productName);
+    await expect(this.page.locator(SELECTOR.LBL_PRODUCT_NAME)).toHaveText(
+      productName,
+    );
   }
 
   async expectProductVisible(productName: string): Promise<void> {
