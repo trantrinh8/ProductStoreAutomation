@@ -95,7 +95,7 @@ export class LoginModal extends BasePage {
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () =>
-      this.signUpModal.footerButton("Sign up").click(),
+      this.signUpModal.footerButton("Sign up").dispatchClick(),
     );
 
     await this.signUpModal.forceClose();
@@ -111,7 +111,7 @@ export class LoginModal extends BasePage {
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () =>
-      this.signUpModal.footerButton("Sign up").click(),
+      this.signUpModal.footerButton("Sign up").dispatchClick(),
     );
 
     await this.signUpModal.forceClose();
@@ -133,7 +133,7 @@ export class LoginModal extends BasePage {
     await this.fillLogin(username, password);
 
     const message = await this.acceptAlertFrom(async () =>
-      this.loginModal.footerButton("Log in").click(),
+      this.loginModal.footerButton("Log in").dispatchClick(),
     );
 
     await this.loginModal.forceClose();

@@ -17,6 +17,13 @@ export class BaseControl {
     });
   }
 
+  async dispatchClick(): Promise<void> {
+    await test.step(`Dispatch click ${this.name}`, async () => {
+      await this.waitForVisible();
+      await this.locator.dispatchEvent("click");
+    });
+  }
+
   async doubleClick(options?: { timeout?: number }): Promise<void> {
     await test.step(`Double click ${this.name}`, async () => {
       await this.waitForVisible(options?.timeout);
