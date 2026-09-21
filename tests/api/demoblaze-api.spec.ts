@@ -1,37 +1,23 @@
 import { expect, test } from "@playwright/test";
 import {
   BackendProductCategories,
-  DemoblazeApi,
   SonyVaioI5,
   SonyVaioI5ApiProduct,
 } from "../../data/index.js";
-
-interface ProductSummaryResponse {
-  id: number;
-  title: string;
-  price: number;
-}
-
-interface CategoryResponse {
-  Items: ProductSummaryResponse[];
-}
-
-interface ProductDetailResponse {
-  id: number;
-  title: string;
-  price: number;
-  desc: string;
-  img: string;
-}
+import {
+  ProductApi,
+  type CategoryResponse,
+  type ProductDetailResponse,
+} from "../../src/api/index.js";
 
 test.describe("Demoblaze backend API", () => {
-  test("TC-API-001 returns laptop products by category", async ({ request }) => {
-    const response = await request.post(
-      `${DemoblazeApi.baseUrl}${DemoblazeApi.endpoints.byCategory}`,
-      {
-        data: { cat: BackendProductCategories.Laptops },
-      },
-    );
+  test("TC-API-001 returns laptop products by category", async ({
+    request,
+  }) => {
+    const productApi = new ProductApi(request);
+    const response = await productApi.getProductsByCategory({
+      cat: BackendProductCategories.Laptops,
+    });
 
     expect(response.ok()).toBeTruthy();
 
@@ -41,13 +27,11 @@ test.describe("Demoblaze backend API", () => {
     expect(body.Items.map((item) => item.title)).toContain(SonyVaioI5.name);
   });
 
-  test("TC-API-002 returns product details by product id", async ({ request }) => {
-    const response = await request.post(
-      `${DemoblazeApi.baseUrl}${DemoblazeApi.endpoints.viewProduct}`,
-      {
-        data: SonyVaioI5ApiProduct,
-      },
-    );
+  test("TC-API-002 returns product details by product id", async ({
+    request,
+  }) => {
+    const productApi = new ProductApi(request);
+    const response = await productApi.getProductDetails(SonyVaioI5ApiProduct);
 
     expect(response.ok()).toBeTruthy();
 
@@ -62,12 +46,10 @@ test.describe("Demoblaze backend API", () => {
   test("TC-API-003 returns an empty product list for an unknown category", async ({
     request,
   }) => {
-    const response = await request.post(
-      `${DemoblazeApi.baseUrl}${DemoblazeApi.endpoints.byCategory}`,
-      {
-        data: { cat: BackendProductCategories.Unknown },
-      },
-    );
+    const productApi = new ProductApi(request);
+    const response = await productApi.getProductsByCategory({
+      cat: BackendProductCategories.Unknown,
+    });
 
     expect(response.ok()).toBeTruthy();
 
