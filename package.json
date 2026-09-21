@@ -14,7 +14,10 @@
     "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
     "allure:open": "allure open ./allure-report",
     "test:allure": "npm run test && npm run allure:generate && npm run allure:open",
+    "k6:smoke": "k6 run performance/scenarios/demoblaze-smoke.js",
     "k6:load": "k6 run performance/scenarios/demoblaze-load.js",
+    "k6:stress": "k6 run performance/scenarios/demoblaze-stress.js",
+    "k6:spike": "k6 run performance/scenarios/demoblaze-spike.js",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

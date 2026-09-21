@@ -1,9 +1,12 @@
-import http from "k6/http";
-import { check, sleep } from "k6";
+import { group, sleep } from "k6";
+import {
+  firstProductIdFrom,
+  getProductDetails,
+  getProductsByCategory,
+  verifyCategoryResponse,
+  verifyProductDetailsResponse,
+} from "../utils/demoblaze-api.js";
 import { jsonHeaders } from "../utils/headers.js";
-import { byCategoryPayload, viewProductPayload } from "../utils/payloads.js";
-
-const apiBaseUrl = "https://api.demoblaze.com";
 
 export const options = {
   stages: [
@@ -20,27 +23,13 @@ export const options = {
 export default function () {
   const params = jsonHeaders();
 
-  const byCategoryResponse = http.post(
-    `${apiBaseUrl}/bycat`,
-    byCategoryPayload("notebook"),
-    params,
-  );
-  check(byCategoryResponse, {
-    "bycat returns 200": (response) => response.status === 200,
-    "bycat includes products": (response) =>
-      Array.isArray(response.json("Items")),
-  });
+  group("Browse notebook category", () => {
+    const byCategoryResponse = getProductsByCategory("notebook", params);
+    verifyCategoryResponse(byCategoryResponse);
 
-  const productId = byCategoryResponse.json("Items.0.id") || 8;
-  const viewResponse = http.post(
-    `${apiBaseUrl}/view`,
-    viewProductPayload(productId),
-    params,
-  );
-  check(viewResponse, {
-    "view returns 200": (response) => response.status === 200,
-    "view includes product title": (response) =>
-      Boolean(response.json("title")),
+    const productId = firstProductIdFrom(byCategoryResponse);
+    const viewResponse = getProductDetails(productId, params);
+    verifyProductDetailsResponse(viewResponse);
   });
 
   sleep(1);

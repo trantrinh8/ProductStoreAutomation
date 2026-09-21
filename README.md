@@ -38,10 +38,13 @@ Or run the combined command:
 npm run test:allure
 ```
 
-## Run K6 Load Test
+## Run K6 Performance Tests
 
 ```powershell
+npm run k6:smoke
 npm run k6:load
+npm run k6:stress
+npm run k6:spike
 ```
 
 ## Environment Variables
