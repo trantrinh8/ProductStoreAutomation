@@ -1,32 +1,17 @@
 import { expect, test } from "@playwright/test";
-import { HomePage, type ProductCategory } from "../../src/pages/home.page.js";
+import {
+  AppleMonitor24,
+  CategoryProductSamples,
+  RapidCategorySwitchSequence,
+  SamsungGalaxyS6,
+  SonyVaioI5,
+} from "../../data/index.js";
+import { HomePage } from "../../src/pages/home.page.js";
 import { ProductPage } from "../../src/pages/product.page.js";
 import { CartPage } from "../../src/pages/cart.page.js";
 
-const categorySamples: Array<{
-  testCaseId: string;
-  category: ProductCategory;
-  productName: string;
-}> = [
-  {
-    testCaseId: "TC-HOME-002",
-    category: "Phones",
-    productName: "Samsung galaxy s6",
-  },
-  {
-    testCaseId: "TC-HOME-001",
-    category: "Laptops",
-    productName: "Sony vaio i5",
-  },
-  {
-    testCaseId: "TC-HOME-003",
-    category: "Monitors",
-    productName: "Apple monitor 24",
-  },
-];
-
 test.describe("Demoblaze catalog and navigation", () => {
-  for (const { testCaseId, category, productName } of categorySamples) {
+  for (const { testCaseId, category, productName } of CategoryProductSamples) {
     test(`${testCaseId} filters products by ${category}`, async ({ page }) => {
       const homePage = new HomePage(page);
 
@@ -49,12 +34,12 @@ test.describe("Demoblaze catalog and navigation", () => {
 
     await test.step("Open Laptops category", async () => {
       await homePage.open();
-      await homePage.filterByCategory("Laptops");
+      await homePage.filterByCategory(SonyVaioI5.category);
     });
 
     await test.step("Open Sony vaio i5 detail page", async () => {
-      await homePage.selectProduct("Sony vaio i5");
-      await productPage.expectProduct("Sony vaio i5", "790");
+      await homePage.selectProduct(SonyVaioI5.name);
+      await productPage.expectProduct(SonyVaioI5.name, SonyVaioI5.price);
     });
   });
 
@@ -66,10 +51,10 @@ test.describe("Demoblaze catalog and navigation", () => {
     await homePage.open();
 
     await test.step("Switch Phones, Laptops, then Monitors", async () => {
-      await homePage.filterByCategory("Phones");
-      await homePage.filterByCategory("Laptops");
-      await homePage.filterByCategory("Monitors");
-      await homePage.expectProductVisible("Apple monitor 24");
+      for (const category of RapidCategorySwitchSequence) {
+        await homePage.filterByCategory(category);
+      }
+      await homePage.expectProductVisible(AppleMonitor24.name);
     });
   });
 
@@ -81,8 +66,8 @@ test.describe("Demoblaze catalog and navigation", () => {
     await homePage.open();
 
     await test.step("Sony vaio i5 is not listed under Phones", async () => {
-      await homePage.filterByCategory("Phones");
-      await homePage.expectProductAbsent("Sony vaio i5");
+      await homePage.filterByCategory(SamsungGalaxyS6.category);
+      await homePage.expectProductAbsent(SonyVaioI5.name);
     });
   });
 
@@ -94,8 +79,8 @@ test.describe("Demoblaze catalog and navigation", () => {
 
     await test.step("Open a PDP where both Cart and Add to cart links exist", async () => {
       await homePage.open();
-      await homePage.filterByCategory("Laptops");
-      await homePage.selectProduct("Sony vaio i5");
+      await homePage.filterByCategory(SonyVaioI5.category);
+      await homePage.selectProduct(SonyVaioI5.name);
       await expect(
         page.getByRole("link", { name: "Add to cart" }),
       ).toBeVisible();

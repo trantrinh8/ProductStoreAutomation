@@ -1,4 +1,19 @@
 import { expect, test } from "@playwright/test";
+import {
+  BlankPasswordUser,
+  BlankUsernameUser,
+  DuplicateUser,
+  DuplicateUserAlert,
+  GeneratedValidUser,
+  InvalidPasswordLogin,
+  LongUsernameUser,
+  RequiredCredentialsAlert,
+  SpecialCharacterUser,
+  SuccessfulOrDuplicateSignupPattern,
+  UnknownUser,
+  UnknownUserLogin,
+  WrongPasswordUser,
+} from "../../data/index.js";
 import { HomePage } from "../../src/pages/home.page.js";
 import { LoginModal } from "../../src/pages/login.modal.js";
 import { getEnv } from "../../src/utils/env.util.js";
@@ -13,10 +28,10 @@ test.describe("Demoblaze authentication", () => {
   }, testInfo) => {
     const env = getEnv();
     const username = uniqueUsername(
-      `${env.defaultUsername}_${testInfo.project.name}`,
+      `${env.defaultUsername}_${GeneratedValidUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
-    const password = env.defaultPassword;
+    const password = env.defaultPassword ?? GeneratedValidUser.password;
     const homePage = new HomePage(page);
     const loginModal = new LoginModal(page);
 
@@ -26,7 +41,7 @@ test.describe("Demoblaze authentication", () => {
 
     await test.step("Create a new user account", async () => {
       const message = await loginModal.signUp(username, password);
-      expect(message).toMatch(/Sign up successful|This user already exist/);
+      expect(message).toMatch(SuccessfulOrDuplicateSignupPattern);
     });
 
     await test.step("Log in with the created account", async () => {
@@ -68,7 +83,7 @@ test.describe("Demoblaze authentication", () => {
   }, testInfo) => {
     const env = getEnv();
     const username = uniqueUsername(
-      `duplicate_${testInfo.project.name}`,
+      `${DuplicateUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
     const homePage = new HomePage(page);
@@ -78,7 +93,7 @@ test.describe("Demoblaze authentication", () => {
 
     await test.step("Create user first time", async () => {
       const message = await loginModal.signUp(username, env.defaultPassword);
-      expect(message).toMatch(/Sign up successful|This user already exist/);
+      expect(message).toMatch(SuccessfulOrDuplicateSignupPattern);
     });
 
     await test.step("Attempt to create same user again", async () => {
@@ -86,7 +101,7 @@ test.describe("Demoblaze authentication", () => {
         username,
         env.defaultPassword,
       );
-      expect(message).toContain("This user already exist");
+      expect(message).toContain(DuplicateUserAlert);
     });
   });
 
@@ -95,7 +110,7 @@ test.describe("Demoblaze authentication", () => {
   }, testInfo) => {
     const env = getEnv();
     const username = uniqueUsername(
-      `wrong_password_${testInfo.project.name}`,
+      `${WrongPasswordUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
     const homePage = new HomePage(page);
@@ -107,9 +122,9 @@ test.describe("Demoblaze authentication", () => {
     await test.step("Log in with wrong password", async () => {
       const message = await loginModal.logInExpectingAlert(
         username,
-        "wrong-password",
+        InvalidPasswordLogin.password,
       );
-      expect(message).toContain("Wrong password");
+      expect(message).toContain(InvalidPasswordLogin.expectedMessage);
       await expect(page.locator("#nameofuser")).toBeHidden();
     });
   });
@@ -120,7 +135,7 @@ test.describe("Demoblaze authentication", () => {
     const homePage = new HomePage(page);
     const loginModal = new LoginModal(page);
     const username = uniqueUsername(
-      `unknown_${testInfo.project.name}`,
+      `${UnknownUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
 
@@ -129,9 +144,9 @@ test.describe("Demoblaze authentication", () => {
     await test.step("Log in with unknown username", async () => {
       const message = await loginModal.logInExpectingAlert(
         username,
-        "any-password",
+        UnknownUserLogin.password,
       );
-      expect(message).toContain("User does not exist");
+      expect(message).toContain(UnknownUserLogin.expectedMessage);
     });
   });
 
@@ -146,10 +161,10 @@ test.describe("Demoblaze authentication", () => {
 
     await test.step("Submit sign up with blank username", async () => {
       const message = await loginModal.signUpExpectingAlert(
-        "",
+        BlankUsernameUser.username,
         env.defaultPassword,
       );
-      expect(message).toContain("Please fill out Username and Password");
+      expect(message).toContain(RequiredCredentialsAlert);
     });
   });
 
@@ -159,15 +174,18 @@ test.describe("Demoblaze authentication", () => {
     const homePage = new HomePage(page);
     const loginModal = new LoginModal(page);
     const username = uniqueUsername(
-      `blank_password_${testInfo.project.name}`,
+      `${BlankPasswordUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
 
     await homePage.open();
 
     await test.step("Submit sign up with blank password", async () => {
-      const message = await loginModal.signUpExpectingAlert(username, "");
-      expect(message).toContain("Please fill out Username and Password");
+      const message = await loginModal.signUpExpectingAlert(
+        username,
+        BlankPasswordUser.password,
+      );
+      expect(message).toContain(RequiredCredentialsAlert);
     });
   });
 
@@ -178,7 +196,7 @@ test.describe("Demoblaze authentication", () => {
     const homePage = new HomePage(page);
     const loginModal = new LoginModal(page);
     const username = uniqueUsername(
-      `long_${testInfo.project.name}`,
+      `${LongUsernameUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     ).padEnd(128, "x");
 
@@ -186,7 +204,7 @@ test.describe("Demoblaze authentication", () => {
 
     await test.step("Sign up with 128-character username", async () => {
       const message = await loginModal.signUp(username, env.defaultPassword);
-      expect(message).toMatch(/Sign up successful|This user already exist/);
+      expect(message).toMatch(SuccessfulOrDuplicateSignupPattern);
     });
   });
 
@@ -197,7 +215,7 @@ test.describe("Demoblaze authentication", () => {
     const homePage = new HomePage(page);
     const loginModal = new LoginModal(page);
     const username = uniqueUsername(
-      `special_${testInfo.project.name}_!@$`,
+      `${SpecialCharacterUser.prefix}_${testInfo.project.name}`,
       testInfo.workerIndex,
     );
 
@@ -205,7 +223,7 @@ test.describe("Demoblaze authentication", () => {
 
     await test.step("Sign up with special-character username", async () => {
       const message = await loginModal.signUp(username, env.defaultPassword);
-      expect(message).toMatch(/Sign up successful|This user already exist/);
+      expect(message).toMatch(SuccessfulOrDuplicateSignupPattern);
     });
   });
 });
