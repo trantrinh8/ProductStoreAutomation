@@ -42,64 +42,9 @@ jobs:
       - name: Validate K6 spike scenario
         run: k6 inspect performance/scenarios/demoblaze-spike.js
 
-      - name: Generate Allure-compatible performance results
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p allure-results
-          node <<'NODE'
-          const fs = require('fs');
-          const crypto = require('crypto');
-
-          const summaryPath = 'performance-summary.json';
-          const summary = fs.existsSync(summaryPath)
-            ? JSON.parse(fs.readFileSync(summaryPath, 'utf8'))
-            : { metrics: {} };
-          const failedRate = summary.metrics.http_req_failed?.values?.rate ?? 1;
-          const p95 = summary.metrics.http_req_duration?.values?.['p(95)'] ?? 0;
-          const checksRate = summary.metrics.checks?.values?.rate ?? 0;
-          const passed = failedRate < 0.01 && p95 < 1000 && checksRate === 1;
-          const uuid = crypto.randomUUID();
-          const now = Date.now();
-
-          const result = {
-            uuid,
-            historyId: 'k6-demoblaze-smoke-performance',
-            name: 'K6 smoke performance test',
-            fullName: 'performance.scenarios.demoblaze-smoke',
-            status: passed ? 'passed' : 'failed',
-            stage: 'finished',
-            start: now,
-            stop: now,
-            labels: [
-              { name: 'suite', value: 'Performance' },
-              { name: 'framework', value: 'k6' },
-              { name: 'language', value: 'javascript' }
-            ],
-            parameters: [
-              { name: 'http_req_failed.rate', value: String(failedRate) },
-              { name: 'http_req_duration.p95', value: String(p95) },
-              { name: 'checks.rate', value: String(checksRate) }
-            ]
-          };
-
-          fs.writeFileSync(`allure-results/${uuid}-result.json`, JSON.stringify(result, null, 2));
-          NODE
-
-      - name: Generate Allure report
-        if: always()
-        run: npm run allure:generate
-
       - name: Upload performance summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: k6-performance-summary
           path: performance-summary.json
-
-      - name: Upload Performance Allure report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-allure-report
-          path: allure-report
