@@ -1,0 +1,26 @@
+{
+  "name": "demoblaze-automation-framework",
+  "version": "1.0.0",
+  "description": "Production-ready Playwright, Allure, and K6 testing framework for Demoblaze.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
+    "allure:open": "allure open ./allure-report",
+    "test:allure": "npm run test && npm run allure:generate && npm run allure:open",
+    "k6:load": "k6 run performance/scenarios/demoblaze-load.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.5.2",
+    "allure-commandline": "^2.34.1",
+    "allure-playwright": "^3.3.3",
+    "dotenv": "^17.2.2",
+    "typescript": "^5.9.2"
+  }
+}
