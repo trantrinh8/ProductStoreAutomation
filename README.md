@@ -4,6 +4,10 @@ Production-ready automation framework for `https://www.demoblaze.com` using Type
 
 This task is designed to evaluate your capability in handling test case documentation, architecting a scalable end-to-end automation framework, and showcasing hands-on automation proficiency.
 
+## Test Case Documentation
+
+Detailed functional, edge-case, negative-path, performance, test-data, and traceability coverage is documented in `docs/Demoblaze_Test_Cases.xlsx`.
+
 ## Install
 
 ```powershell
