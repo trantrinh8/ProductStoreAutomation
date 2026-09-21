@@ -7,7 +7,7 @@ export abstract class BasePage {
 
   protected navLink(name: string): ButtonControl {
     return new ButtonControl(
-      this.page.getByRole("link", { name }),
+      this.page.getByRole("link", { name, exact: true }),
       `${name} navigation link`,
     );
   }
