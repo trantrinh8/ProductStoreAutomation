@@ -90,13 +90,25 @@ export class LoginModal extends BasePage {
     ).fill(password);
   }
 
+  private async submitSignUpForm(): Promise<void> {
+    await this.page.evaluate(() => {
+      (window as unknown as { register: () => void }).register();
+    });
+  }
+
+  private async submitLoginForm(): Promise<void> {
+    await this.page.evaluate(() => {
+      (window as unknown as { logIn: () => void }).logIn();
+    });
+  }
+
   async signUp(username: string, password: string): Promise<string> {
     await this.openSignUpModal();
     await this.fillSignUp(username, password);
 
-    const message = await this.acceptAlertFrom(async () =>
-      this.signUpModal.footerButton("Sign up").dispatchClick(),
-    );
+    const message = await this.acceptAlertFrom(async () => {
+      await this.submitSignUpForm();
+    });
 
     await this.signUpModal.forceClose();
 
@@ -110,9 +122,9 @@ export class LoginModal extends BasePage {
     await this.openSignUpModal();
     await this.fillSignUp(username, password);
 
-    const message = await this.acceptAlertFrom(async () =>
-      this.signUpModal.footerButton("Sign up").dispatchClick(),
-    );
+    const message = await this.acceptAlertFrom(async () => {
+      await this.submitSignUpForm();
+    });
 
     await this.signUpModal.forceClose();
 
@@ -132,9 +144,9 @@ export class LoginModal extends BasePage {
     await this.openLoginModal();
     await this.fillLogin(username, password);
 
-    const message = await this.acceptAlertFrom(async () =>
-      this.loginModal.footerButton("Log in").dispatchClick(),
-    );
+    const message = await this.acceptAlertFrom(async () => {
+      await this.submitLoginForm();
+    });
 
     await this.loginModal.forceClose();
 
