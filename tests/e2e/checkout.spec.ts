@@ -3,7 +3,7 @@ import {
   ProductAddedAlert,
   SonyVaioI5,
   ValidPurchaseOrder,
-} from "../../data/index.js";
+} from "../../data/testData.data.js";
 import { CartPage } from "../../src/pages/cart.page.js";
 import { HomePage } from "../../src/pages/home.page.js";
 import { ProductPage } from "../../src/pages/product.page.js";

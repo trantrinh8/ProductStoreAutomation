@@ -13,9 +13,9 @@ import {
   UnknownUser,
   UnknownUserLogin,
   WrongPasswordUser,
-} from "../../data/index.js";
+} from "../../data/testData.data.js";
 import { HomePage } from "../../src/pages/home.page.js";
-import { LoginModal } from "../../src/pages/login.modal.js";
+import { LoginModal } from "../../src/pages/login.page.js";
 import { getEnv } from "../../src/utils/env.util.js";
 
 function uniqueUsername(prefix: string, workerIndex: number): string {

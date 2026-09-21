@@ -1,8 +1,8 @@
 import { type Page } from "@playwright/test";
-import { ButtonControl } from "../controls/button.control.js";
-import { InputControl } from "../controls/input.control.js";
-import { ModalControl } from "../controls/modal.control.js";
-import { BasePage } from "./base.page.js";
+import { ButtonControl } from "../controls/buttonControl.helper.js";
+import { InputControl } from "../controls/inputControl.helper.js";
+import { ModalControl } from "../controls/modalControl.helper.js";
+import { BasePage } from "./pageBase.page.js";
 
 const SELECTOR = {
   MODAL_LOGIN: "//div[@id='logInModal']",

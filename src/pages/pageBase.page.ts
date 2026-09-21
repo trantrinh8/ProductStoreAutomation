@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { ButtonControl } from "../controls/button.control.js";
+import { ButtonControl } from "../controls/buttonControl.helper.js";
 import { AlertUtil } from "../utils/alert.util.js";
 
 const SELECTOR = {

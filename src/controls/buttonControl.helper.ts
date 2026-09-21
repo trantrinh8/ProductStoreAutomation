@@ -1,5 +1,5 @@
 import { type Locator } from "@playwright/test";
-import { BaseControl } from "./base.control.js";
+import { BaseControl } from "./baseControl.helper.js";
 
 export class ButtonControl extends BaseControl {
   constructor(locator: Locator, name: string) {

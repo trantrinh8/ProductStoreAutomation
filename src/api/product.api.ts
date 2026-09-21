@@ -3,7 +3,7 @@ import {
   DemoblazeApi,
   type CategoryPayloadData,
   type ProductViewPayloadData,
-} from "../../data/index.js";
+} from "../../data/testData.data.js";
 import { ApiUtil } from "./api.util.js";
 
 export interface ProductSummaryResponse {

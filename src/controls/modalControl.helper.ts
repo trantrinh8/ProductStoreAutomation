@@ -1,7 +1,7 @@
 import { expect, test, type Locator } from "@playwright/test";
-import { BaseControl } from "./base.control.js";
-import { ButtonControl } from "./button.control.js";
-import { InputControl } from "./input.control.js";
+import { BaseControl } from "./baseControl.helper.js";
+import { ButtonControl } from "./buttonControl.helper.js";
+import { InputControl } from "./inputControl.helper.js";
 
 export class ModalControl extends BaseControl {
   constructor(locator: Locator, name: string) {

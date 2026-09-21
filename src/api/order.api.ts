@@ -1,5 +1,5 @@
 import type { APIRequestContext, APIResponse } from "@playwright/test";
-import { DemoblazeApi } from "../../data/index.js";
+import { DemoblazeApi } from "../../data/testData.data.js";
 import { ApiUtil } from "./api.util.js";
 
 export interface CreateOrderApiPayload {

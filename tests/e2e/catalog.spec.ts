@@ -5,7 +5,7 @@ import {
   RapidCategorySwitchSequence,
   SamsungGalaxyS6,
   SonyVaioI5,
-} from "../../data/index.js";
+} from "../../data/testData.data.js";
 import { HomePage } from "../../src/pages/home.page.js";
 import { ProductPage } from "../../src/pages/product.page.js";
 import { CartPage } from "../../src/pages/cart.page.js";

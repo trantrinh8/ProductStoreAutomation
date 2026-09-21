@@ -3,12 +3,12 @@ import {
   BackendProductCategories,
   SonyVaioI5,
   SonyVaioI5ApiProduct,
-} from "../../data/index.js";
+} from "../../data/testData.data.js";
 import {
   ProductApi,
   type CategoryResponse,
   type ProductDetailResponse,
-} from "../../src/api/index.js";
+} from "../../src/api/apiIndex.api.js";
 
 test.describe("Demoblaze backend API", () => {
   test("TC-API-001 returns laptop products by category", async ({

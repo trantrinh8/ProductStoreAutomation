@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
-import { ButtonControl } from "../controls/button.control.js";
-import { BasePage } from "./base.page.js";
+import { ButtonControl } from "../controls/buttonControl.helper.js";
+import { BasePage } from "./pageBase.page.js";
 
 const SELECTOR = {
   LNK_ADD_TO_CART: "//a[normalize-space()='Add to cart']",
