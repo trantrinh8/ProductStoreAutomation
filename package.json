@@ -18,6 +18,7 @@
     "k6:load": "k6 run performance/scenarios/demoblaze-load.js",
     "k6:stress": "k6 run performance/scenarios/demoblaze-stress.js",
     "k6:spike": "k6 run performance/scenarios/demoblaze-spike.js",
+    "allure:performance": "node scripts/generate-performance-allure-result.mjs performance-summary.json allure-results",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
