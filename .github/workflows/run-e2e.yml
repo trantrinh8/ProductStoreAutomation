@@ -1,4 +1,4 @@
-name: Run All Tests
+name: Run E2E Tests
 
 on:
   push:
@@ -13,8 +13,8 @@ permissions:
   id-token: write
 
 jobs:
-  tests:
-    name: Playwright API and E2E Tests
+  e2e:
+    name: Playwright E2E Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,8 +32,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
 
-      - name: Run all Playwright tests
-        run: npm run test
+      - name: Run E2E tests
+        run: npm run test:e2e
 
       - name: Generate Allure report
         if: always()
@@ -43,7 +43,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
+          name: e2e-allure-report
           path: allure-report
 
       - name: Upload Pages artifact
@@ -53,9 +53,9 @@ jobs:
           path: allure-report
 
   deploy-report:
-    name: Deploy Allure Report
+    name: Deploy E2E Allure Report
     if: always() && github.ref == 'refs/heads/main'
-    needs: tests
+    needs: e2e
     runs-on: ubuntu-latest
     environment:
       name: github-pages

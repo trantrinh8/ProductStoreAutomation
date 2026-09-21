@@ -1,0 +1,43 @@
+name: Run Performance Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  performance:
+    name: K6 Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup K6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run K6 smoke performance tests
+        run: npm run k6:smoke
+
+      - name: Validate K6 load scenario
+        run: k6 inspect performance/scenarios/demoblaze-load.js
+
+      - name: Validate K6 stress scenario
+        run: k6 inspect performance/scenarios/demoblaze-stress.js
+
+      - name: Validate K6 spike scenario
+        run: k6 inspect performance/scenarios/demoblaze-spike.js
