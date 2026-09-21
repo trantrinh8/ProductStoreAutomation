@@ -2,7 +2,10 @@ import { group, sleep } from "k6";
 import {
   getProductDetails,
   getProductsByCategory,
+  verifyCategoryContainsProduct,
   verifyCategoryResponse,
+  verifyEmptyCategoryResponse,
+  verifyProductDetailsMatch,
   verifyProductDetailsResponse,
 } from "../utils/demoblaze-api.js";
 import { jsonHeaders } from "../utils/headers.js";
@@ -20,8 +23,25 @@ export default function () {
   const params = jsonHeaders();
 
   group("Smoke check core product APIs", () => {
-    verifyCategoryResponse(getProductsByCategory("notebook", params));
-    verifyProductDetailsResponse(getProductDetails(8, params));
+    const notebookResponse = getProductsByCategory("notebook", params);
+    verifyCategoryResponse(notebookResponse);
+    verifyCategoryContainsProduct(notebookResponse, "Sony vaio i5");
+
+    const phoneResponse = getProductsByCategory("phone", params);
+    verifyCategoryResponse(phoneResponse);
+    verifyCategoryContainsProduct(phoneResponse, "Samsung galaxy s6");
+
+    const monitorResponse = getProductsByCategory("monitor", params);
+    verifyCategoryResponse(monitorResponse);
+    verifyCategoryContainsProduct(monitorResponse, "Apple monitor 24");
+
+    const productDetailsResponse = getProductDetails(8, params);
+    verifyProductDetailsResponse(productDetailsResponse);
+    verifyProductDetailsMatch(productDetailsResponse, "Sony vaio i5", 8);
+
+    verifyEmptyCategoryResponse(
+      getProductsByCategory("unknown-category", params),
+    );
   });
 
   sleep(1);
