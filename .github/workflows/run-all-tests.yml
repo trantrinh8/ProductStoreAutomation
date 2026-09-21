@@ -1,4 +1,4 @@
-name: Playwright Tests and Allure Report
+name: Run All Tests
 
 on:
   push:
@@ -13,8 +13,8 @@ permissions:
   id-token: write
 
 jobs:
-  e2e:
-    name: E2E Tests
+  tests:
+    name: Playwright API and E2E Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,7 +32,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox
 
-      - name: Run Playwright tests
+      - name: Run all Playwright tests
         run: npm run test
 
       - name: Generate Allure report
@@ -55,7 +55,7 @@ jobs:
   deploy-report:
     name: Deploy Allure Report
     if: always() && github.ref == 'refs/heads/main'
-    needs: e2e
+    needs: tests
     runs-on: ubuntu-latest
     environment:
       name: github-pages
