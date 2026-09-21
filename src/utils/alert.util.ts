@@ -8,8 +8,7 @@ export class AlertUtil {
     expectedMessage?: string,
   ): Promise<string> {
     const dialogPromise = page.waitForEvent("dialog");
-    await trigger();
-    const dialog = await dialogPromise;
+    const [dialog] = await Promise.all([dialogPromise, trigger()]);
     const message = dialog.message();
 
     if (expectedMessage) {
