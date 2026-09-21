@@ -7,15 +7,20 @@ export class AlertUtil {
     trigger: () => Promise<void>,
     expectedMessage?: string,
   ): Promise<string> {
-    const dialogPromise = page.waitForEvent("dialog");
-    const [dialog] = await Promise.all([dialogPromise, trigger()]);
-    const message = dialog.message();
+    const handledDialogPromise = page
+      .waitForEvent("dialog")
+      .then(async (dialog) => {
+        const message = dialog.message();
 
-    if (expectedMessage) {
-      expect(message).toContain(expectedMessage);
-    }
+        if (expectedMessage) {
+          expect(message).toContain(expectedMessage);
+        }
 
-    await dialog.accept();
+        await dialog.accept();
+        return message;
+      });
+
+    const [message] = await Promise.all([handledDialogPromise, trigger()]);
     return message;
   }
 

@@ -90,24 +90,12 @@ export class LoginModal extends BasePage {
     ).fill(password);
   }
 
-  private async submitSignUpForm(): Promise<void> {
-    await this.page.evaluate(() => {
-      (window as unknown as { register: () => void }).register();
-    });
-  }
-
-  private async submitLoginForm(): Promise<void> {
-    await this.page.evaluate(() => {
-      (window as unknown as { logIn: () => void }).logIn();
-    });
-  }
-
   async signUp(username: string, password: string): Promise<string> {
     await this.openSignUpModal();
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.submitSignUpForm();
+      await this.signUpModal.footerButton("Sign up").click();
     });
 
     await this.signUpModal.forceClose();
@@ -123,7 +111,7 @@ export class LoginModal extends BasePage {
     await this.fillSignUp(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.submitSignUpForm();
+      await this.signUpModal.footerButton("Sign up").click();
     });
 
     await this.signUpModal.forceClose();
@@ -145,7 +133,7 @@ export class LoginModal extends BasePage {
     await this.fillLogin(username, password);
 
     const message = await this.acceptAlertFrom(async () => {
-      await this.submitLoginForm();
+      await this.loginModal.footerButton("Log in").click();
     });
 
     await this.loginModal.forceClose();
