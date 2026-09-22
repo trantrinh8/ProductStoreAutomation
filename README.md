@@ -43,6 +43,8 @@ This task is designed to evaluate your capability in handling test case document
 
 Detailed functional, edge-case, negative-path, performance, test-data, and traceability coverage is documented in `docs/Demoblaze_Test_Cases.xlsx`.
 
+API and performance-specific testcase coverage is documented in `docs/Demoblaze_API_Performance_Test_Cases.xlsx`.
+
 ## Prerequisites
 
 - Node.js 22 or later
